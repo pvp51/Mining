@@ -11,25 +11,25 @@ def readFile(fileName):
     crs.close
     return dict
 
-# Reading the dictionary(database) create a list of unique transcations and transactions
+# Reading the dictionary(database) create a list of unique itemsets and itemsets
 def createUniqueItemSet(database):
-    uniqueTxn = []
-    txn=[]
+    uniqueItemsets = []
+    itemsets=[]
     for itemset in database.values():
         for item in itemset.split(','):
-            txn.append(item)
-            if not item in uniqueTxn:
-                uniqueTxn.append(item)
-    return uniqueTxn, txn
+            itemsets.append(item)
+            if not item in uniqueItemsets:
+                uniqueItemsets.append(item)
+    return uniqueItemsets, itemsets
 
 # Return the dictionary with itemSet and support 
-def createItemSet(uniqueTxn, txn):
+def createItemSet(uniqueItemsets, itemsets):
     dict = {}
     support=0
-    for item in uniqueTxn:
+    for item in uniqueItemsets:
         support=0
-        if item in txn:
-            support=txn.count(item)
+        if item in itemsets:
+            support=itemsets.count(item)
             dict[item] = support
     return dict
 
@@ -56,15 +56,16 @@ min_support = 50
 min_confidence = 70
 db = readFile("db1.txt")    #reading (database) file in the dictionary
 print(db.values())
-uniqueTxn = []
-txn=[]
-uniqueTxn, txn = createUniqueItemSet(db)
+uniqueItemsets = []
+itemsets=[]
 
-print("uniqueTxn: "+str(uniqueTxn))
-print("txn: "+str(txn))
+uniqueItemsets, itemsets = createUniqueItemSet(db)
+
+print("uniqueItemsets: "+str(uniqueItemsets))
+print("itemsets: "+str(itemsets))
 
 itemSet1 = {}
-itemSet1 = createItemSet(uniqueTxn,txn) #create C1 as in HW1 sol.
+itemSet1 = createItemSet(uniqueItemsets,itemsets) #create C1 as in HW1 sol.
 
 print("ItemSet1: "+str(itemSet1))
 
@@ -83,7 +84,7 @@ length = len(globalDict)
 for i in globalDict.keys():
     keys.append(i)
 print("Return List: "+str(keys) + " Length: " + str(length))
-returnList = aprioriGen(keys,length)
+returnList = aprioriGen(keys,2)
 
 print("Return List: "+str(returnList))
 
