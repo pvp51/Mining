@@ -18,8 +18,7 @@ def createUniqueItemSet(database):
     for itemset in database.values():
         for item in itemset.split(','):
             itemsets.append(item)
-            if not item in uniqueItemsets:
-                uniqueItemsets.append(item)
+        uniqueItemsets = set(itemsets)
     return uniqueItemsets, itemsets
 
 # Return the dictionary with itemSet and support 
@@ -56,7 +55,7 @@ min_support = 50
 min_confidence = 70
 db = readFile("db1.txt")    #reading (database) file in the dictionary
 print(db.values())
-uniqueItemsets = []
+uniqueItemsets = set([])
 itemsets=[]
 
 uniqueItemsets, itemsets = createUniqueItemSet(db)
@@ -76,16 +75,17 @@ print("GlobalDict: "+str(globalDict))
 
 globalDict = updateGlobalDict(globalDict)
 
-print("GlobalDict: "+str(globalDict))
+print("GlobalDict after removing itemset below min. support: "+str(globalDict))
 
 returnList = []
 keys = []
 length = len(globalDict)
-for i in globalDict.keys():
+for i in globalDict.keys(): #putting keys of dictionary in a list
     keys.append(i)
-print("Return List: "+str(keys) + " Length: " + str(length))
-returnList = aprioriGen(keys,2)
+KeySet = set(keys)  #creating a set out of a list to call aprioriGen method
+print("KeySet: "+str(KeySet) + " Length: " + str(length))
 
+returnList = aprioriGen(KeySet,2)
 print("Return List: "+str(returnList))
 
 
