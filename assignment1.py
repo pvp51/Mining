@@ -28,9 +28,9 @@ def createUniqueItemSet(database):
         for itemset in i:
             for item in itemset.split(','):
                 itemsets.append(item)
-                if item not in uniqueItemsets:
-                    uniqueItemsets.append(item)
-    return uniqueItemsets, itemsets
+                if [item] not in uniqueItemsets:
+                    uniqueItemsets.append([item])
+    return list(map(frozenset,uniqueItemsets)), itemsets
 
 # Return the dictionary with itemSet and support 
 def createItemSet(uniqueItemsets, itemsets):
@@ -73,7 +73,6 @@ itemsets = []
 uniqueItemsets, itemsets = createUniqueItemSet(db)
 
 print("uniqueItemsets: "+str(uniqueItemsets))
-print(list(map(frozenset,uniqueItemsets)))  #splits the string instead of keeping it joined
 print("itemsets: "+str(itemsets))
 
 itemSet1 = {}
