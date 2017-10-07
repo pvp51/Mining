@@ -7,48 +7,55 @@ from itertools import chain, combinations
 # reads data from the txt file 
 def readFile(fileName):
     dict = {}
-    dbList = []
-    txnList = []
     crs = open(fileName, "r")
     for columns in ( raw.strip().split() for raw in crs ): 
         dict[columns[0]] = columns[1]
     crs.close
 
+    itemsets = list()  
+    txnSetList = list() 
     for i in dict.values():
-        dbList = []
-        dbList.append(i)
-        txnList.append(dbList)  
-    return txnList
+        itemsets = []
+        for item in i.split(','):
+            itemsets.append(item)
+        txnSetList.append(set(itemsets))
+
+    return txnSetList
 
 # Reading the dictionary(database) create a list of unique itemsets and itemsets
 def createUniqueItemSet(database):
-    uniqueItemsets = []
-    itemsets = []
+    uniqueItems = list()
+    itemsets = list()
     for i in database:
         for itemset in i:
             for item in itemset.split(','):
                 itemsets.append(item)
-                if [item] not in uniqueItemsets:
-                    uniqueItemsets.append([item])
-    return list(map(frozenset,uniqueItemsets)), itemsets
+                if [item] not in uniqueItems:
+                    uniqueItems.append([item])
+    print("uniqueItems: "+str(list(map(frozenset,uniqueItems))))
+    #print("itemsets: "+str(itemsets))
+    return list(map(frozenset,uniqueItems)), itemsets
 
 # Return the dictionary with itemSet and support 
-def createItemSet(uniqueItemsets, itemsets):
-    dict = {}
+def scanD(txnSetList, uniqueItems, min_support):
+    dict={}
     support=0
-    for item in uniqueItemsets:
+    for item in uniqueItems:
         support=0
-        if item in itemsets:
-            support=itemsets.count(item)
-            dict[item] = support
-    return dict
+        for txn in txnSetList:
+            if item.issubset(txn):
+                support= support + 1
+            dict[item]=support
 
-# Return the dictionary with itemSet and support 
-def updateGlobalDict(globalDict):
-    for k, v in list(globalDict.items()):
-        if v/len(db)*100 < min_support:
-            del globalDict[k]
-    return globalDict
+    print(dict)
+    itemSet = []
+
+    for k, v in list(dict.items()):
+        if v/len(txnSetList)*100 >= min_support:
+            itemSet.append(k)
+    dict = {}
+    print("Itemset: "+str(itemSet))
+    return itemSet
 
 def aprioriGen(Lk, k): #creates Ck
     retList = []
@@ -62,43 +69,29 @@ def aprioriGen(Lk, k): #creates Ck
     return retList
 
 
-db = []
+#################################
 min_support = 50
 min_confidence = 70
-db = readFile("db1.txt")    #reading (database) file as list of list of transactions
-print("List of transactions: "+str(db))
-uniqueItemsets = []
-itemsets = []
+txnSetList = readFile("db1.txt")    #reading (database) file as list of list of transactions
+print("List of transactions: "+str(txnSetList))
 
-uniqueItemsets, itemsets = createUniqueItemSet(db)
+uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 
-print("uniqueItemsets: "+str(uniqueItemsets))
-print("itemsets: "+str(itemsets))
+itemSet1 = scanD(txnSetList, uniqueItems, min_support)
 
-itemSet1 = {}
-itemSet1 = createItemSet(uniqueItemsets,itemsets) #create C1 as in HW1 sol.
+itemSet = [itemSet1] 
+print("ItemSet1: "+str(itemSet))
+k = 2
+while(len(itemSet[k-2])>0):
+    Ck = aprioriGen(itemSet[k - 2], k)
+    Lk = scanD(itemSet1, Ck, min_support)
+    #support_data.update(supK)
+    itemSet.append(Lk)
+    k += 1
 
-print("ItemSet1: "+str(itemSet1))
+print("Final:" +str(itemSet))
 
-globalDict = {} #global dictionary to hold all valid itemsets for association rules
-globalDict = itemSet1   
 
-print("GlobalDict: "+str(globalDict))
-
-globalDict = updateGlobalDict(globalDict)
-
-print("GlobalDict after removing itemset below min. support: "+str(globalDict))
-
-returnList = []
-keys = []
-length = len(globalDict)
-for i in globalDict.keys(): #putting keys of dictionary in a list
-    keys.append(i)
-KeySet = set(keys)  #creating a set out of a list to call aprioriGen method
-print("KeySet: "+str(KeySet) + " Length: " + str(length))
-
-#returnList = aprioriGen(KeySet,2)
-#print("Return List: "+str(returnList))
 
 
     
