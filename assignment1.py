@@ -1,24 +1,35 @@
 #! /usr/bin/python
 
+from itertools import chain, combinations
+
 # Function definition is here
 
 # reads data from the txt file 
 def readFile(fileName):
     dict = {}
+    dbList = []
+    txnList = []
     crs = open(fileName, "r")
-    for columns in ( raw.strip().split() for raw in crs ):
-        dict[columns[0]] = columns[1] 
+    for columns in ( raw.strip().split() for raw in crs ): 
+        dict[columns[0]] = columns[1]
     crs.close
-    return dict
+
+    for i in dict.values():
+        dbList = []
+        dbList.append(i)
+        txnList.append(dbList)  
+    return txnList
 
 # Reading the dictionary(database) create a list of unique itemsets and itemsets
 def createUniqueItemSet(database):
     uniqueItemsets = []
-    itemsets=[]
-    for itemset in database.values():
-        for item in itemset.split(','):
-            itemsets.append(item)
-        uniqueItemsets = set(itemsets)
+    itemsets = []
+    for i in database:
+        for itemset in i:
+            for item in itemset.split(','):
+                itemsets.append(item)
+                if item not in uniqueItemsets:
+                    uniqueItemsets.append(item)
     return uniqueItemsets, itemsets
 
 # Return the dictionary with itemSet and support 
@@ -50,17 +61,19 @@ def aprioriGen(Lk, k): #creates Ck
                 retList.append(Lk[i] | Lk[j]) #set union
     return retList
 
-db = {}
+
+db = []
 min_support = 50
 min_confidence = 70
-db = readFile("db1.txt")    #reading (database) file in the dictionary
-print(db.values())
-uniqueItemsets = set([])
-itemsets=[]
+db = readFile("db1.txt")    #reading (database) file as list of list of transactions
+print("List of transactions: "+str(db))
+uniqueItemsets = []
+itemsets = []
 
 uniqueItemsets, itemsets = createUniqueItemSet(db)
 
 print("uniqueItemsets: "+str(uniqueItemsets))
+print(list(map(frozenset,uniqueItemsets)))  #splits the string instead of keeping it joined
 print("itemsets: "+str(itemsets))
 
 itemSet1 = {}
@@ -85,8 +98,8 @@ for i in globalDict.keys(): #putting keys of dictionary in a list
 KeySet = set(keys)  #creating a set out of a list to call aprioriGen method
 print("KeySet: "+str(KeySet) + " Length: " + str(length))
 
-returnList = aprioriGen(KeySet,2)
-print("Return List: "+str(returnList))
+#returnList = aprioriGen(KeySet,2)
+#print("Return List: "+str(returnList))
 
 
     
