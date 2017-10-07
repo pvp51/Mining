@@ -66,6 +66,7 @@ def aprioriGen(Lk, k): #creates Ck
             L1.sort(); L2.sort()
             if L1==L2: #if first k-2 elements are equal
                 retList.append(Lk[i] | Lk[j]) #set union
+    print("New pair of itemsets: "+str(retList))
     return retList
 
 
@@ -80,7 +81,7 @@ uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 itemSet1 = scanD(txnSetList, uniqueItems, min_support)
 
 itemSet = [itemSet1] 
-print("ItemSet1: "+str(itemSet))
+print("Initial itemset: "+str(itemSet))
 k = 2
 while(len(itemSet[k-2])>0):
     Ck = aprioriGen(itemSet[k - 2], k)
