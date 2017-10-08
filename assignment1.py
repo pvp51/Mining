@@ -37,7 +37,7 @@ def createUniqueItemSet(database):
     return list(map(frozenset,uniqueItems)), itemsets
 
 # Return the dictionary with itemSet and support 
-def scanD(txnSetList, uniqueItems, min_support):
+def scanDB(txnSetList, uniqueItems, min_support):
     dict={}
     support=0
     for item in uniqueItems:
@@ -57,13 +57,16 @@ def scanD(txnSetList, uniqueItems, min_support):
     print("Itemset: "+str(itemSet))
     return itemSet
 
-def aprioriGen(Lk, k): #creates Ck
+#Returns the new pair of itemsets
+def generateItemsets(Lk, k): 
     retList = []
     lenLk = len(Lk)
     for i in range(lenLk):
         for j in range(i+1, lenLk): 
-            L1 = list(Lk[i])[:k-2]; L2 = list(Lk[j])[:k-2]
-            L1.sort(); L2.sort()
+            L1 = list(Lk[i])[:k-2]
+            L2 = list(Lk[j])[:k-2]
+            L1.sort()
+            L2.sort()
             if L1==L2: #if first k-2 elements are equal
                 retList.append(Lk[i] | Lk[j]) #set union
     print("New pair of itemsets: "+str(retList))
@@ -78,16 +81,17 @@ print("List of transactions: "+str(txnSetList))
 
 uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 
-itemSet1 = scanD(txnSetList, uniqueItems, min_support)
+itemSet1 = scanDB(txnSetList, uniqueItems, min_support)
 
 itemSet = [itemSet1] 
 print("Initial itemset: "+str(itemSet))
 k = 2
-while(len(itemSet[k-2])>0):
-    Ck = aprioriGen(itemSet[k - 2], k)
-    Lk = scanD(itemSet1, Ck, min_support)
+while(len(itemSet[k-2]) > 0):
+#while(itemSet == []):
+    candidateKeys = generateItemsets(itemSet[k - 2], k)
+    newItemSets = scanDB(txnSetList, candidateKeys, min_support)
     #support_data.update(supK)
-    itemSet.append(Lk)
+    itemSet.append(newItemSets)
     k += 1
 
 print("Final:" +str(itemSet))
