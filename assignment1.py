@@ -38,24 +38,24 @@ def createUniqueItemSet(database):
 
 # Return the dictionary with itemSet and support 
 def scanDB(txnSetList, uniqueItems, min_support):
-    dict={}
+    key_support={}
     support=0
     for item in uniqueItems:
         support=0
         for txn in txnSetList:
             if item.issubset(txn):
                 support= support + 1
-            dict[item]=support
+            key_support[item]=support
 
-    print(dict)
+    print(key_support)
     itemSet = []
 
-    for k, v in list(dict.items()):
+    for k, v in list(key_support.items()):
         if v/len(txnSetList)*100 >= min_support:
             itemSet.append(k)
-    dict = {}
     print("Itemset: "+str(itemSet))
-    return itemSet
+    print("Support Data: "+str(key_support))
+    return itemSet, key_support
 
 #Returns the new pair of itemsets
 def generateItemsets(Lk, k): 
@@ -81,20 +81,21 @@ print("List of transactions: "+str(txnSetList))
 
 uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 
-itemSet1 = scanDB(txnSetList, uniqueItems, min_support)
+itemSet1, key_support = scanDB(txnSetList, uniqueItems, min_support)
 
 itemSet = [itemSet1] 
 print("Initial itemset: "+str(itemSet))
 k = 2
-while(len(itemSet[k-2]) > 0):
+while(len(itemSet[k-2]) >= 1):
 #while(itemSet == []):
     candidateKeys = generateItemsets(itemSet[k - 2], k)
-    newItemSets = scanDB(txnSetList, candidateKeys, min_support)
-    #support_data.update(supK)
+    newItemSets, k_s = scanDB(txnSetList, candidateKeys, min_support)
+    key_support.update(k_s)
     itemSet.append(newItemSets)
     k += 1
 
 print("Final:" +str(itemSet))
+print("Key with Support:" +str(key_support))
 
 
 
