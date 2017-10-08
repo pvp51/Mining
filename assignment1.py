@@ -72,11 +72,45 @@ def generateItemsets(Lk, k):
     print("New pair of itemsets: "+str(retList))
     return retList
 
+def generateAssociationRules(L, support_data, min_confidence):
+    rules = []
+    for i in range(1, len(L)):
+        for freqSet in L[i]:
+            H1 = [frozenset([item]) for item in freqSet]
+            print("freqSet"+ str(freqSet)+ ' H1 '+str(H1))
+            if (i > 1):
+                generateMoreRules(freqSet, H1, support_data, rules, min_confidence)
+            else:
+                findConfidence(freqSet, H1, support_data, rules, min_confidence)
+    return rules
+
+
+def findConfidence(freqSet, H, support_data, rules, min_confidence):
+    "Evaluate the rule generated"
+    pruned_H = []
+    for conseq in H:
+        conf = (support_data[freqSet] / support_data[freqSet - conseq]) * 100
+        if conf >= min_confidence:
+            print(freqSet-conseq,'-->',conseq,'conf:',conf)
+            rules.append((freqSet - conseq, conseq, conf))
+            pruned_H.append(conseq)
+    return pruned_H
+
+
+def generateMoreRules(freqSet, H, support_data, rules, min_confidence):
+    "Generate a set of candidate rules"
+    m = len(H[0])
+    if (len(freqSet) > (m + 1)):
+        Hmp1 = generateItemsets(H, m + 1)
+        Hmp1 = findConfidence(freqSet, Hmp1,  support_data, rules, min_confidence)
+        if len(Hmp1) > 1:
+            generateMoreRules(freqSet, Hmp1, support_data, rules, min_confidence)
+
 
 #################################
-min_support = 50
-min_confidence = 70
-txnSetList = readFile("db1.txt")    #reading (database) file as list of list of transactions
+min_support = 20
+min_confidence = 50
+txnSetList = readFile("db2.txt")    #reading (database) file as list of list of transactions
 print("List of transactions: "+str(txnSetList))
 
 uniqueItems, itemsets = createUniqueItemSet(txnSetList)
@@ -85,9 +119,9 @@ itemSet1, key_support = scanDB(txnSetList, uniqueItems, min_support)
 
 itemSet = [itemSet1] 
 print("Initial itemset: "+str(itemSet))
-k = 2
+k = 2   #size of itemsets to create 
 while(len(itemSet[k-2]) >= 1):
-#while(itemSet == []):
+#while(candidateKeys != set([])):
     candidateKeys = generateItemsets(itemSet[k - 2], k)
     newItemSets, k_s = scanDB(txnSetList, candidateKeys, min_support)
     key_support.update(k_s)
@@ -97,17 +131,7 @@ while(len(itemSet[k-2]) >= 1):
 print("Final:" +str(itemSet))
 print("Key with Support:" +str(key_support))
 
-
-
-
-    
-
-
-
-
-
-
-
-
+rules = generateAssociationRules(itemSet, key_support, min_confidence)
+print(rules)
 
 
