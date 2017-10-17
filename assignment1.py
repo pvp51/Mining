@@ -1,15 +1,17 @@
 #! /usr/bin/python
 
-from itertools import chain, combinations
+import glob 
 
 # Function definition is here
 
 # reads data from the txt file 
 def readFile(fileName):
     dict = {}
+    print("Transactions:")
     crs = open(fileName, "r")
     for columns in ( raw.strip().split() for raw in crs ): 
         dict[columns[0]] = columns[1]
+        print(str(columns[0]) + " : "+ str(columns[1]))
     crs.close
 
     itemsets = list()  
@@ -32,7 +34,7 @@ def createUniqueItemSet(database):
                 itemsets.append(item)
                 if [item] not in uniqueItems:
                     uniqueItems.append([item])
-    print("uniqueItems: "+str(list(map(frozenset,uniqueItems))))
+    #print("uniqueItems: "+str(list(map(frozenset,uniqueItems))))
     #print("itemsets: "+str(itemsets))
     return list(map(frozenset,uniqueItems)), itemsets
 
@@ -47,14 +49,14 @@ def scanDB(txnSetList, uniqueItems, min_support):
                 support= support + 1
             key_support[item]=support
 
-    print(key_support)
+    #print(key_support)
     itemSet = []
 
     for k, v in list(key_support.items()):
         if v/len(txnSetList)*100 >= min_support:
             itemSet.append(k)
-    print("Itemset: "+str(itemSet))
-    print("Support Data: "+str(key_support))
+    #print("Itemset: "+str(itemSet))
+    #print("Support Data: "+str(key_support))
     return itemSet, key_support
 
 #Returns the new pair of itemsets
@@ -69,7 +71,7 @@ def generateItemsets(Lk, k):
             L2.sort()
             if L1==L2: #if first k-2 elements are equal
                 retList.append(Lk[i] | Lk[j]) #set union
-    print("New pair of itemsets: "+str(retList))
+    #print("New pair of itemsets: "+str(retList))
     return retList
 
 def generateAssociationRules(L, support_data, min_confidence):
@@ -77,7 +79,7 @@ def generateAssociationRules(L, support_data, min_confidence):
     for i in range(1, len(L)):
         for freqSet in L[i]:
             H1 = [frozenset([item]) for item in freqSet]
-            print("freqSet"+ str(freqSet)+ ' H1 '+str(H1))
+            #print("freqSet"+ str(freqSet)+ ' H1 '+str(H1))
             if (i > 1):
                 generateMoreRules(freqSet, H1, support_data, rules, min_confidence)
             else:
@@ -110,28 +112,34 @@ def generateMoreRules(freqSet, H, support_data, rules, min_confidence):
 #################################
 min_support = 20
 min_confidence = 50
-txnSetList = readFile("db2.txt")    #reading (database) file as list of list of transactions
-print("List of transactions: "+str(txnSetList))
+files = glob.glob('*.txt')
+for file in files:
+    print("****************************************")
+    print(file)
+    txnSetList = readFile(file)   #reading (database) file as list of list of transactions
 
-uniqueItems, itemsets = createUniqueItemSet(txnSetList)
+    #print("List of transactions: "+str(txnSetList))
 
-itemSet1, key_support = scanDB(txnSetList, uniqueItems, min_support)
+    uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 
-itemSet = [itemSet1] 
-print("Initial itemset: "+str(itemSet))
-k = 2   #size of itemsets to create 
-while(len(itemSet[k-2]) >= 1):
-#while(candidateKeys != set([])):
-    candidateKeys = generateItemsets(itemSet[k - 2], k)
-    newItemSets, k_s = scanDB(txnSetList, candidateKeys, min_support)
-    key_support.update(k_s)
-    itemSet.append(newItemSets)
-    k += 1
+    itemSet1, key_support = scanDB(txnSetList, uniqueItems, min_support)
 
-print("Final:" +str(itemSet))
-print("Key with Support:" +str(key_support))
+    itemSet = [itemSet1] 
+    #print("Initial itemset: "+str(itemSet))
+    k = 2   #size of itemsets to create 
+    while(len(itemSet[k-2]) >= 1):
+    #while(candidateKeys != set([])):
+        candidateKeys = generateItemsets(itemSet[k - 2], k)
+        newItemSets, k_s = scanDB(txnSetList, candidateKeys, min_support)
+        key_support.update(k_s)
+        itemSet.append(newItemSets)
+        k += 1
 
-rules = generateAssociationRules(itemSet, key_support, min_confidence)
-print(rules)
+    #print("Final:" +str(itemSet))
+    #print("Key with Support:" +str(key_support))
+    print("Association Rules:")
+    rules = generateAssociationRules(itemSet, key_support, min_confidence)
+    #print("rules: "+str(rules))
+    print("****************************************")
 
 
