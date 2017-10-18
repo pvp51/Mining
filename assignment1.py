@@ -60,17 +60,14 @@ def scanDB(txnSetList, uniqueItems, min_support):
     return itemSet, key_support
 
 #Returns the new pair of itemsets
-def generateItemsets(Lk, k): 
-    retList = []
-    lenLk = len(Lk)
-    for i in range(lenLk):
-        for j in range(i+1, lenLk): 
-            L1 = list(Lk[i])[:k-2]
-            L2 = list(Lk[j])[:k-2]
-            L1.sort()
-            L2.sort()
-            if L1==L2: #if first k-2 elements are equal
-                retList.append(Lk[i] | Lk[j]) #set union
+def generateItemsets(itemSet, length):
+    subItemSet = list()
+    retList = list()
+    for i in itemSet:            
+        subItemSet = set([i.union(j) for i in itemSet for j in itemSet if len(i.union(j)) == length])    
+    
+    for i in subItemSet:
+         retList.append(i)
     #print("New pair of itemsets: "+str(retList))
     return retList
 
@@ -123,12 +120,13 @@ for file in files:
     uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 
     itemSet1, key_support = scanDB(txnSetList, uniqueItems, min_support)
-
+    print(itemSet1)
     itemSet = [itemSet1] 
     #print("Initial itemset: "+str(itemSet))
     k = 2   #size of itemsets to create 
     while(len(itemSet[k-2]) >= 1):
     #while(candidateKeys != set([])):
+        print("test: "+str(itemSet[k - 2]))
         candidateKeys = generateItemsets(itemSet[k - 2], k)
         newItemSets, k_s = scanDB(txnSetList, candidateKeys, min_support)
         key_support.update(k_s)
