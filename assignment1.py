@@ -4,7 +4,7 @@ import glob
 
 # Function definition is here
 
-# reads data from the txt file 
+"Reads data from the txt file"
 def readFile(fileName):
     dict = {}
     print("Transactions:")
@@ -24,7 +24,7 @@ def readFile(fileName):
 
     return txnSetList
 
-# Reading the dictionary(database) create a list of unique itemsets and itemsets
+"Reading the dictionary(database) create a list of unique itemsets and itemsets"
 def createUniqueItemSet(database):
     uniqueItems = list()
     itemsets = list()
@@ -38,7 +38,7 @@ def createUniqueItemSet(database):
     #print("itemsets: "+str(itemsets))
     return list(map(frozenset,uniqueItems)), itemsets
 
-# Return the dictionary with itemSet and support 
+"Return the dictionary with itemSet and support"
 def scanDB(txnSetList, uniqueItems, min_support):
     key_support={}
     support=0
@@ -59,51 +59,50 @@ def scanDB(txnSetList, uniqueItems, min_support):
     #print("Support Data: "+str(key_support))
     return itemSet, key_support
 
-#Returns the new pair of itemsets
+"Returns the new pair of itemsets"
 def generateItemsets(itemSet, length):
     subItemSet = list()
     retList = list()
-    for i in itemSet:            
-        subItemSet = set([i.union(j) for i in itemSet for j in itemSet if len(i.union(j)) == length])    
+    for x in itemSet:            
+        subItemSet = set([x.union(y) for x in itemSet for y in itemSet if len(x.union(y)) == length])    
     
     for i in subItemSet:
          retList.append(i)
     #print("New pair of itemsets: "+str(retList))
     return retList
 
-def generateAssociationRules(L, support_data, min_confidence):
+def generateAssociationRules(L, key_support, min_confidence):
     rules = []
     for i in range(1, len(L)):
-        for freqSet in L[i]:
-            H1 = [frozenset([item]) for item in freqSet]
-            #print("freqSet"+ str(freqSet)+ ' H1 '+str(H1))
+        for Item in L[i]:
+            rhs = [frozenset([item]) for item in Item]
+            #print("Item"+ str(Item)+ ' rhs '+str(rhs))
             if (i > 1):
-                generateMoreRules(freqSet, H1, support_data, rules, min_confidence)
+                generateMoreRules(Item, rhs, key_support, rules, min_confidence)
             else:
-                findConfidence(freqSet, H1, support_data, rules, min_confidence)
+                findConfidence(Item, rhs, key_support, rules, min_confidence)
     return rules
 
+"Returns the rule that satisfies minimum confidence criteria"
+def findConfidence(freqItemSet, rhs, key_support, rules, min_confidence):
+    ruleWithMinConf = []
+    for conseq in rhs:
+        confidence = (key_support[freqItemSet] / key_support[freqItemSet - conseq]) * 100
+        if (confidence >= min_confidence):
+            print(freqItemSet-conseq,'-->',conseq,'confidence:',confidence)
+            rules.append((freqItemSet - conseq, conseq, confidence))
+            ruleWithMinConf.append(conseq)
+    return ruleWithMinConf
 
-def findConfidence(freqSet, H, support_data, rules, min_confidence):
-    "Evaluate the rule generated"
-    pruned_H = []
-    for conseq in H:
-        conf = (support_data[freqSet] / support_data[freqSet - conseq]) * 100
-        if conf >= min_confidence:
-            print(freqSet-conseq,'-->',conseq,'conf:',conf)
-            rules.append((freqSet - conseq, conseq, conf))
-            pruned_H.append(conseq)
-    return pruned_H
-
-
-def generateMoreRules(freqSet, H, support_data, rules, min_confidence):
-    "Generate a set of candidate rules"
-    m = len(H[0])
-    if (len(freqSet) > (m + 1)):
-        Hmp1 = generateItemsets(H, m + 1)
-        Hmp1 = findConfidence(freqSet, Hmp1,  support_data, rules, min_confidence)
-        if len(Hmp1) > 1:
-            generateMoreRules(freqSet, Hmp1, support_data, rules, min_confidence)
+"This function generates more rules from our data"
+def generateMoreRules(Item, rhs, key_support, rules, min_confidence):    
+    l2 = len(Item)
+    l1 = len(rhs[0])    
+    if (l2 > (l1 + 1)):
+        newRhs = generateItemsets(rhs, l1 + 1)
+        newRhs = findConfidence(Item, newRhs,  key_support, rules, min_confidence)
+        if (len(newRhs) >= 0):
+            generateMoreRules(Item, newRhs, key_support, rules, min_confidence)
 
 
 #################################
