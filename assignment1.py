@@ -83,15 +83,21 @@ def generateAssociationRules(L, key_support, min_confidence):
                 findConfidence(Item, rhs, key_support, rules, min_confidence)
     return rules
 
+def getConfidence(key_support, freqItemSet, postSet):
+    return (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
+
+
 "Returns the rule that satisfies minimum confidence criteria"
 def findConfidence(freqItemSet, rhs, key_support, rules, min_confidence):
     ruleWithMinConf = []
-    for conseq in rhs:
-        confidence = (key_support[freqItemSet] / key_support[freqItemSet - conseq]) * 100
+    for postSet in rhs:
+        #confidence = (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
+        confidence = getConfidence(key_support, freqItemSet,postSet)
         if (confidence >= min_confidence):
-            print(freqItemSet-conseq,'-->',conseq,'confidence:',confidence)
-            rules.append((freqItemSet - conseq, conseq, confidence))
-            ruleWithMinConf.append(conseq)
+            preSet = freqItemSet-postSet
+            print(preSet,'-->',postSet,'confidence:',confidence)
+            rules.append((preSet, postSet, confidence))
+            ruleWithMinConf.append(postSet)
     return ruleWithMinConf
 
 "This function generates more rules from our data"
@@ -138,5 +144,3 @@ for file in files:
     rules = generateAssociationRules(itemSet, key_support, min_confidence)
     #print("rules: "+str(rules))
     print("****************************************")
-
-
