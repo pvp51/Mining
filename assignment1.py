@@ -112,8 +112,10 @@ def generateMoreRules(Item, rhs, key_support, rules, min_confidence):
 
 
 #################################
-min_support = 20
-min_confidence = 50
+str_support = input("Enter the minimum support: ")#20
+min_support = int(str_support)
+str_confidence = input("Enter the minimu confidence: ")#50
+min_confidence = int(str_confidence)
 files = glob.glob('*.txt')
 for file in files:
     print("****************************************")
