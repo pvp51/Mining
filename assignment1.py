@@ -62,14 +62,14 @@ def scanDB(txnSetList, uniqueItems, min_support):
 "Returns the new pair of itemsets"
 def generateItemsets(itemSet, length):
     subItemSet = list()
-    retList = list()
+    returnList = list()
     for x in itemSet:            
         subItemSet = set([x.union(y) for x in itemSet for y in itemSet if len(x.union(y)) == length])    
     
     for i in subItemSet:
-         retList.append(i)
-    #print("New pair of itemsets: "+str(retList))
-    return retList
+         returnList.append(i)
+    #print("New pair of itemsets: "+str(returnList))
+    return returnList
 
 def generateAssociationRules(L, key_support, min_confidence):
     rules = []
@@ -127,13 +127,13 @@ for file in files:
     uniqueItems, itemsets = createUniqueItemSet(txnSetList)
 
     itemSet1, key_support = scanDB(txnSetList, uniqueItems, min_support)
-    print(itemSet1)
+    #print(itemSet1)
     itemSet = [itemSet1] 
     #print("Initial itemset: "+str(itemSet))
     k = 2   #size of itemsets to create 
     while(len(itemSet[k-2]) >= 1):
     #while(candidateKeys != set([])):
-        print("test: "+str(itemSet[k - 2]))
+        #print("test: "+str(itemSet[k - 2]))
         candidateKeys = generateItemsets(itemSet[k - 2], k)
         newItemSets, k_s = scanDB(txnSetList, candidateKeys, min_support)
         key_support.update(k_s)
