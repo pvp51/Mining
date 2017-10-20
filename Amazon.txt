@@ -6,8 +6,8 @@
 1006    Hdmi,Proteinbar
 1007    Novel,Tops
 1008    Doll,Trimmer,Novel
-1009    PlayStation,Trimmer,
-1010    Doll,Crocs,Alexa,Proteinbar,
+1009    PlayStation,Trimmer
+1010    Doll,Crocs,Alexa,Proteinbar
 1011    Remote,Tops
 1012    Alexa,Crocs,PlayStation
 1013    Proteinbar,Trimmer,Novel,Tops
