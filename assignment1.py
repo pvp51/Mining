@@ -38,6 +38,19 @@ def createUniqueItemSet(database):
     #print("itemsets: "+str(itemsets))
     return list(map(frozenset,uniqueItems)), itemsets
 
+"Returns the rule that satisfies minimum confidence criteria"
+def findConfidence(freqItemSet, rhs, key_support, rules, min_confidence):
+    ruleWithMinConf = []
+    for postSet in rhs:
+        #confidence = (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
+        confidence = getConfidence(key_support, freqItemSet,postSet)
+        if (confidence >= min_confidence):
+            preSet = freqItemSet-postSet
+            print(preSet,'-->',postSet,'confidence:',confidence)
+            rules.append((preSet, postSet, confidence))
+            ruleWithMinConf.append(postSet)
+    return ruleWithMinConf
+
 "Return the dictionary with itemSet and support"
 def scanDB(txnSetList, uniqueItems, min_support):
     key_support={}
@@ -59,47 +72,6 @@ def scanDB(txnSetList, uniqueItems, min_support):
     #print("Support Data: "+str(key_support))
     return itemSet, key_support
 
-"Returns the new pair of itemsets"
-def generateItemsets(itemSet, length):
-    subItemSet = list()
-    returnList = list()
-    for x in itemSet:            
-        subItemSet = set([x.union(y) for x in itemSet for y in itemSet if len(x.union(y)) == length])    
-    
-    for i in subItemSet:
-         returnList.append(i)
-    #print("New pair of itemsets: "+str(returnList))
-    return returnList
-
-def generateAssociationRules(L, key_support, min_confidence):
-    rules = []
-    for i in range(1, len(L)):
-        for Item in L[i]:
-            rhs = [frozenset([item]) for item in Item]
-            #print("Item"+ str(Item)+ ' rhs '+str(rhs))
-            if (i > 1):
-                generateMoreRules(Item, rhs, key_support, rules, min_confidence)
-            else:
-                findConfidence(Item, rhs, key_support, rules, min_confidence)
-    return rules
-
-def getConfidence(key_support, freqItemSet, postSet):
-    return (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
-
-
-"Returns the rule that satisfies minimum confidence criteria"
-def findConfidence(freqItemSet, rhs, key_support, rules, min_confidence):
-    ruleWithMinConf = []
-    for postSet in rhs:
-        #confidence = (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
-        confidence = getConfidence(key_support, freqItemSet,postSet)
-        if (confidence >= min_confidence):
-            preSet = freqItemSet-postSet
-            print(preSet,'-->',postSet,'confidence:',confidence)
-            rules.append((preSet, postSet, confidence))
-            ruleWithMinConf.append(postSet)
-    return ruleWithMinConf
-
 "This function generates more rules from our data"
 def generateMoreRules(Item, rhs, key_support, rules, min_confidence):    
     l2 = len(Item)
@@ -115,18 +87,45 @@ def generateMoreRules(Item, rhs, key_support, rules, min_confidence):
             else:
                 break
 
+"Returns the new pair of itemsets"
+def generateItemsets(itemSet, length):
+    subItemSet = list()
+    returnList = list()
+    for x in itemSet:            
+        subItemSet = set([x.union(y) for x in itemSet for y in itemSet if len(x.union(y)) == length])    
+    
+    for i in subItemSet:
+         returnList.append(i)
+    #print("New pair of itemsets: "+str(returnList))
+    return returnList
 
-#################################
-str_support = input("Enter the minimum support (in integer %): ")#20
+"Returns the final association rules for given transactions"
+def generateAssociationRules(L, key_support, min_confidence):
+    rules = []
+    for i in range(1, len(L)):
+        for Item in L[i]:
+            rhs = [frozenset([item]) for item in Item]
+            #print("Item"+ str(Item)+ ' rhs '+str(rhs))
+            if (i > 1):
+                generateMoreRules(Item, rhs, key_support, rules, min_confidence)
+            else:
+                findConfidence(Item, rhs, key_support, rules, min_confidence)
+    return rules
+
+"returns the confidence for given parameters passed"
+def getConfidence(key_support, freqItemSet, postSet):
+    return (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
+
+################################# Start of the program form here
+str_support = input("Enter the minimum support (in integer %): ")
 min_support = int(str_support)
-str_confidence = input("Enter the minimu confidence (in integer %): ")#50
+str_confidence = input("Enter the minimum confidence (in integer %): ")
 min_confidence = int(str_confidence)
 files = glob.glob('*.txt')
 for file in files:
     print("****************************************")
     print(file)
     txnSetList = readFile(file)   #reading (database) file as list of list of transactions
-
     #print("List of transactions: "+str(txnSetList))
 
     uniqueItems, itemsets = createUniqueItemSet(txnSetList)
@@ -136,7 +135,7 @@ for file in files:
     itemSet = [itemSet1] 
     #print("Initial itemset: "+str(itemSet))
     k = 2   #size of itemsets to create 
-    while(len(itemSet[k-2]) > 0):
+    while(len(itemSet[k-2]) >= 1):
     #while(candidateKeys != set([])):
         #print("test: "+str(itemSet[k - 2]))
         candidateKeys = generateItemsets(itemSet[k - 2], k)

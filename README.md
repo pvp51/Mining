@@ -1,5 +1,7 @@
 # Mining
 
+Tested with Python 3 on Win 10 machine.
+
 assignment1.py is the main file.
 There are 5 database files:
     Amazon.txt
@@ -7,11 +9,3 @@ There are 5 database files:
     Kmart.txt
     Shoprite.txt
     Walmart.txt
-
-
-
-http://adataanalyst.com/machine-learning/apriori-algorithm-python-3-0/
-
-https://github.com/asaini/Apriori/blob/master/apriori.py
-
-http://aimotion.blogspot.com/2013/01/machine-learning-and-data-mining.html
