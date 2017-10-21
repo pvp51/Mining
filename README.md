@@ -8,6 +8,8 @@ There are 5 database files:
     Shoprite.txt
     Walmart.txt
 
+
+
 http://adataanalyst.com/machine-learning/apriori-algorithm-python-3-0/
 
 https://github.com/asaini/Apriori/blob/master/apriori.py

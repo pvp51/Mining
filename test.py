@@ -15,6 +15,17 @@ itemSet = [frozenset({'B'}), frozenset({'C'}), frozenset({'D'}), frozenset({'A'}
 name = joinSet(itemSet, 2)
 print(name)
 
+while (len(newRhs) >= 2):
+            l1 = len(newRhs[0])    
+            if (l2 > (l1 + 1)):
+                newRhs = generateItemsets(newRhs, l1 + 1)
+                newRhs = findConfidence(Item, newRhs,  key_support, rules, min_confidence)
+            else:
+                break
+
+            if (len(newRhs) > 1):
+            generateMoreRules(Item, newRhs, key_support, rules, min_confidence)
+
 
 # def generateItemsets(Lk, k): 
 #     retList = []

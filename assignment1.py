@@ -106,15 +106,20 @@ def generateMoreRules(Item, rhs, key_support, rules, min_confidence):
     l1 = len(rhs[0])    
     if (l2 > (l1 + 1)):
         newRhs = generateItemsets(rhs, l1 + 1)
-        newRhs = findConfidence(Item, newRhs,  key_support, rules, min_confidence)
-        if (len(newRhs) >= 0):
-            generateMoreRules(Item, newRhs, key_support, rules, min_confidence)
+        newRhs = findConfidence(Item, newRhs, key_support, rules, min_confidence)
+        while (len(newRhs) >= 2):
+            l1 = len(newRhs[0])    
+            if (l2 > (l1 + 1)):
+                newRhs = generateItemsets(newRhs, l1 + 1)
+                newRhs = findConfidence(Item, newRhs,  key_support, rules, min_confidence)
+            else:
+                break
 
 
 #################################
-str_support = input("Enter the minimum support: ")#20
+str_support = input("Enter the minimum support (in integer %): ")#20
 min_support = int(str_support)
-str_confidence = input("Enter the minimu confidence: ")#50
+str_confidence = input("Enter the minimu confidence (in integer %): ")#50
 min_confidence = int(str_confidence)
 files = glob.glob('*.txt')
 for file in files:
@@ -131,7 +136,7 @@ for file in files:
     itemSet = [itemSet1] 
     #print("Initial itemset: "+str(itemSet))
     k = 2   #size of itemsets to create 
-    while(len(itemSet[k-2]) >= 1):
+    while(len(itemSet[k-2]) > 0):
     #while(candidateKeys != set([])):
         #print("test: "+str(itemSet[k - 2]))
         candidateKeys = generateItemsets(itemSet[k - 2], k)
