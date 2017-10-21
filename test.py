@@ -1,30 +1,36 @@
 #! /usr/bin/python
+t = frozenset()
+t = frozenset({'a'})
+print(t)
+z = set()
+z = t
+print(set(t))
 
-def joinSet(itemSet, length):
-    subItemSet = list()
-    retList = list()
-    for i in itemSet:            
-        subItemSet = set([i.union(j) for i in itemSet for j in itemSet if len(i.union(j)) == length])    
+# def joinSet(itemSet, length):
+#     subItemSet = list()
+#     retList = list()
+#     for i in itemSet:            
+#         subItemSet = set([i.union(j) for i in itemSet for j in itemSet if len(i.union(j)) == length])    
     
-    for i in subItemSet:
-         retList.append(i)
-    print(retList)
-    return retList
+#     for i in subItemSet:
+#          retList.append(i)
+#     print(retList)
+#     return retList
 
-itemSet = [frozenset({'B'}), frozenset({'C'}), frozenset({'D'}), frozenset({'A'})]
-name = joinSet(itemSet, 2)
-print(name)
+# itemSet = [frozenset({'B'}), frozenset({'C'}), frozenset({'D'}), frozenset({'A'})]
+# name = joinSet(itemSet, 2)
+# print(name)
 
-while (len(newRhs) >= 2):
-            l1 = len(newRhs[0])    
-            if (l2 > (l1 + 1)):
-                newRhs = generateItemsets(newRhs, l1 + 1)
-                newRhs = findConfidence(Item, newRhs,  key_support, rules, min_confidence)
-            else:
-                break
+# while (len(newRhs) >= 2):
+#             l1 = len(newRhs[0])    
+#             if (l2 > (l1 + 1)):
+#                 newRhs = generateItemsets(newRhs, l1 + 1)
+#                 newRhs = findConfidence(Item, newRhs,  key_support, rules, min_confidence)
+#             else:
+#                 break
 
-            if (len(newRhs) > 1):
-            generateMoreRules(Item, newRhs, key_support, rules, min_confidence)
+#             if (len(newRhs) > 1):
+#             generateMoreRules(Item, newRhs, key_support, rules, min_confidence)
 
 
 # def generateItemsets(Lk, k): 

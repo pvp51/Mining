@@ -46,7 +46,7 @@ def findConfidence(freqItemSet, rhs, key_support, rules, min_confidence):
         confidence = getConfidence(key_support, freqItemSet,postSet)
         if (confidence >= min_confidence):
             preSet = freqItemSet-postSet
-            print(preSet,'-->',postSet,'confidence:',confidence)
+            print(set(preSet),'--->',set(postSet),'confidence:',confidence)
             rules.append((preSet, postSet, confidence))
             ruleWithMinConf.append(postSet)
     return ruleWithMinConf
