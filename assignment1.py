@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import glob 
+import glob #for reading list of files from the folder
 
 # Function definition is here
 
