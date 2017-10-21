@@ -42,7 +42,6 @@ def createUniqueItemSet(database):
 def findConfidence(freqItemSet, rhs, key_support, rules, min_confidence):
     ruleWithMinConf = []
     for postSet in rhs:
-        #confidence = (key_support[freqItemSet] / key_support[freqItemSet - postSet]) * 100
         confidence = getConfidence(key_support, freqItemSet,postSet)
         if (confidence >= min_confidence):
             preSet = freqItemSet-postSet
